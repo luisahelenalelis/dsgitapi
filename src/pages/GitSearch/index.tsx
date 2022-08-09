@@ -1,20 +1,66 @@
 import "./styles.css";
 
 import ResultCard from "components/ResultCard";
+import { useState } from "react";
+import axios from "axios";
+
+type FormData = {
+  login: string;
+  searched: boolean;
+};
+
+type Profile = {
+  avatar_url: string;
+  url: string;
+  followers: string;
+  location: string;
+  name: string;
+};
 
 const GitSearch = () => {
+  const [formData, setFormData] = useState<FormData>({
+    login: "",
+    searched: false,
+  });
+  const [profile, setProfile] = useState<Profile>();
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const name = event.target.name;
+    const value = event.target.value;
+
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    axios
+      .get(`https://api.github.com/users/${formData.login}`)
+      .then((response) => {
+        setProfile({ found: true, ...response.data });
+        formData.searched = true;
+        console.log(response.data);
+      })
+      .catch((error) => {
+        setProfile(undefined);
+        console.log(error);
+      });
+  };
+
   return (
     <>
       <div className="git-search-container">
         <h1>Encontre um perfil Github</h1>
         <div className="container search-container">
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="form-container">
               <input
                 type="text"
+                name="login"
+                value={formData.login}
                 className="search-input"
                 placeholder=" Usuário Github "
-                onChange={() => {}}
+                onChange={handleChange}
               />
               <button type="submit" className="btn btn-primary search-button">
                 Buscar
@@ -23,26 +69,40 @@ const GitSearch = () => {
           </form>
         </div>
       </div>
-      <div className="main-result-container">
-      <div className="search-result-container">
-        <div className="result-container-avatar">
-          <img
-            src="https://avatars.githubusercontent.com/u/13897257?v=4"
-            alt="Avatar"
-          />
-        </div>
-        <div className="result-container-data">
-          <h6>Informações</h6>
-          <ResultCard
-            title="Perfil:"
-            description="https://api.github.com/users/acenelio"
-          />
-          <ResultCard title="Seguidores:" description="4379" />
-          <ResultCard title="Localidade:" description="Uberlândia" />
-          <ResultCard title="Nome:" description="Nelio Alves" />
-        </div>
-      </div>
-      </div>
+      {profile ? (
+        <>
+          <div className="main-result-container">
+            <div className="search-result-container">
+              <div className="result-container-avatar">
+                <img src={profile.avatar_url} alt="Avatar" />
+              </div>
+              <div className="result-container-data">
+                <h6>Informações</h6>
+                <ResultCard title="Perfil:" description={profile.url} />
+                <ResultCard
+                  title="Seguidores:"
+                  description={profile.followers}
+                />
+                <ResultCard
+                  title="Localidade:"
+                  description={profile.location}
+                />
+                <ResultCard title="Nome:" description={profile.name} />
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
+        formData.searched && (
+          <div className="main-result-container">
+            <div className="search-result-container">
+              <div className="result-container-data">
+                <h6>Perfil não localizado!</h6>
+              </div>
+            </div>
+          </div>
+        )
+      )}
     </>
   );
 };
