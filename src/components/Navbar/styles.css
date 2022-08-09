@@ -1,0 +1,13 @@
+.main-nav {
+  padding-left: 40px;
+  min-height: 70px;
+}
+
+.container-nav {
+  padding: 20px 0;
+}
+
+.container-nav h4 {
+  font-size: 24px;
+  font-weight: 500;
+}

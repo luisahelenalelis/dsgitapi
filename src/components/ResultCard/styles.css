@@ -1,0 +1,22 @@
+.result-container {
+    border-radius: 5px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    margin: 4px 4px 4px 0;
+    border: 1px solid #8c8c8c;
+    border-radius: 4px;
+}
+
+.result-title {
+  color: #515151;
+  font-size: 14px;
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.result-description {
+  color: #515151;
+  font-size: 12px;
+  margin: 0;
+}
