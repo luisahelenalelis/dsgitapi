@@ -3,6 +3,7 @@ import "./styles.css";
 import ResultCard from "components/ResultCard";
 import { useState } from "react";
 import axios from "axios";
+import CardLoader from "components/Loaders";
 
 type FormData = {
   login: string;
@@ -23,6 +24,7 @@ const GitSearch = () => {
     searched: false,
   });
   const [profile, setProfile] = useState<Profile>();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const name = event.target.name;
@@ -34,16 +36,19 @@ const GitSearch = () => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    setIsLoading(true);
     axios
       .get(`https://api.github.com/users/${formData.login}`)
       .then((response) => {
         setProfile({ found: true, ...response.data });
         formData.searched = true;
-        console.log(response.data);
       })
       .catch((error) => {
         setProfile(undefined);
         console.log(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   };
 
@@ -69,7 +74,9 @@ const GitSearch = () => {
           </form>
         </div>
       </div>
-      {profile ? (
+      {isLoading ? (
+        <CardLoader />
+      ) : profile ? (
         <>
           <div className="main-result-container">
             <div className="search-result-container">
